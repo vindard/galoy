@@ -21,7 +21,6 @@ import {
   RouteFindingError,
   SelfPaymentError,
   TransactionRestrictedError,
-  ValidationError,
   TwoFactorError,
 } from "./error"
 import {
@@ -279,7 +278,7 @@ export const LightningMixin = (superclass) =>
         cltv_delta,
         features,
         max_fee,
-      } = await this.validate(params, lightningLogger)
+      } = await validate({ params, logger: lightningLogger })
       const { memo: memoPayer, twoFactorToken: token } = params
 
       // not including message because it contains the preimage and we don't want to log this
