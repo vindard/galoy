@@ -284,7 +284,7 @@ export abstract class UserWallet {
     }
   }
 
-  static validate2fa = ({ secret, token, logger }): boolean => {
+  static throwIf2faNotValid = ({ secret, token, logger }): boolean => {
     if (!secret) {
       throw new TwoFactorError("no 2fa has been set", { logger })
     }
@@ -297,7 +297,7 @@ export abstract class UserWallet {
   }
 
   delete2fa = async ({ token }): Promise<boolean> => {
-    UserWallet.validate2fa({
+    UserWallet.throwIf2faNotValid({
       token,
       secret: this.user.twoFactor.secret,
       logger: this.logger,
