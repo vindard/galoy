@@ -124,7 +124,7 @@ type User {
   coordinate: Coordinate
   status: AccountStatus
   twoFactorEnabled: Boolean
-  remainingTwoFactorThreshold: Int
+  remainingTwoFactorLimit: Int
 }
 
 type Success {
@@ -208,9 +208,16 @@ type Query {
   ): ID
   getLevels: [Int]
   getLimits: Limits
+  getUserLimits: UserLimits
   getWalletFees: WalletFees
   generate2fa: TwoFactorSecret
   validate2fa(token: String!): Boolean
+}
+
+type UserLimits {
+  remainingTwoFactorLimit: Int
+  remainingOnUsLimit: Int
+  remainingWithdrawalLimit: Int
 }
 
 type TwoFactorSecret {

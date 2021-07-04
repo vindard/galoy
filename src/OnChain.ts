@@ -169,10 +169,10 @@ export const OnChainMixin = (superclass) =>
 
             const onchainLoggerOnUs = onchainLogger.child({ onUs: true })
 
-            if (
-              await this.user.limitHit({ on_us: true, amount: amountToSendPayeeUser })
-            ) {
-              const error = `Cannot transfer more than ${this.config.limits.onUsLimit()} sats in 24 hours`
+            if ((await this.user.remainingOnUsLimit()) < amount) {
+              const error = `Cannot transfer more than ${
+                yamlConfig.limits.onUs.level[this.user.level]
+              } sats in 24 hours`
               throw new TransactionRestrictedError(error, { logger: onchainLoggerOnUs })
             }
 
@@ -219,13 +219,13 @@ export const OnChainMixin = (superclass) =>
             ? balance.total_in_BTC - this.user.withdrawFee
             : amount
 
+          if (await this.user.remainingWithdrawalLimit() < checksAmount) {
+            const error = `Cannot withdraw more than ${
+              yamlConfig.limits.withdrawal.level[this.user.level]
+            } sats in 24 hours`
+
           if (checksAmount < this.config.dustThreshold) {
             throw new DustAmountError(undefined, { logger: onchainLogger })
-          }
-
-          if (await this.user.limitHit({ on_us: false, amount: checksAmount })) {
-            const error = `Cannot withdraw more than ${this.config.limits.withdrawalLimit()} sats in 24 hours`
-            throw new TransactionRestrictedError(error, { logger: onchainLogger })
           }
 
           const { lnd } = getActiveOnchainLnd()
