@@ -20,6 +20,7 @@ import { InvoiceUser, Transaction } from "src/schema"
 import { getHash, sleep } from "src/utils"
 import {
   checkIsBalanced,
+  generateTokenHelper,
   getUserWallet,
   lnd1,
   lndOutside1,
@@ -308,7 +309,7 @@ functionToTests.forEach(({ fn, name, initialFee }) => {
     // this is needed because this test runs twice
     if (!userWallet0.user.twoFactor.secret) {
       const { secret } = userWallet0.generate2fa()
-      const token = generateToken(secret)!.token
+      const token = generateTokenHelper({ secret })
       await userWallet0.save2fa({ secret, token })
     }
 
@@ -330,7 +331,7 @@ functionToTests.forEach(({ fn, name, initialFee }) => {
       tokens: userWallet0.user.twoFactor.threshold + 1,
     })
 
-    const token = generateToken(userWallet0.user.twoFactor.secret)!.token
+    const token = generateTokenHelper({ secret: userWallet0.user.twoFactor.secret })
     expect(await fn(userWallet0)({ invoice: request, twoFactorToken: token })).toBe(
       "success",
     )

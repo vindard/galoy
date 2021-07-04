@@ -178,3 +178,13 @@ export const mineBlockAndSync = async ({
   }
   await Promise.all(promiseArray)
 }
+
+export const generateTokenHelper = ({ secret }) => {
+  const generateTokenResult = generateToken(secret)
+  expect(generateTokenResult).toBeTruthy()
+  if (generateTokenResult) {
+    return generateTokenResult.token
+  } else {
+    fail("generateToken returned null")
+  }
+}
