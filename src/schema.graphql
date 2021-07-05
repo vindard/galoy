@@ -206,7 +206,6 @@ type Query {
     phone: String @pattern(regexp: "^\\+[0-9]+$", policy: THROW)
   ): ID
   getLevels: [Int]
-  getLimits: Limits
   getUserLimits: UserLimits
   getWalletFees: WalletFees
   generate2fa: TwoFactorSecret
@@ -226,12 +225,6 @@ type TwoFactorSecret {
 
 type WalletFees {
   deposit: Float
-}
-
-type Limits {
-  oldEnoughForWithdrawal: Int
-  withdrawal: Int
-  onUs: Int
 }
 
 type UpdateUser {
