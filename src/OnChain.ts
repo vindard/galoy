@@ -169,7 +169,9 @@ export const OnChainMixin = (superclass) =>
 
             const onchainLoggerOnUs = onchainLogger.child({ onUs: true })
 
-            if ((await this.user.remainingOnUsLimit()) < amount) {
+            const remainingOnUsLimit = await this.user.remainingOnUsLimit()
+
+            if (remainingOnUsLimit < amount) {
               const error = `Cannot transfer more than ${
                 yamlConfig.limits.onUs.level[this.user.level]
               } sats in 24 hours`
@@ -219,7 +221,9 @@ export const OnChainMixin = (superclass) =>
             ? balance.total_in_BTC - this.user.withdrawFee
             : amount
 
-          if (await this.user.remainingWithdrawalLimit() < checksAmount) {
+          const remainingWithdrawalLimit = await this.user.remainingWithdrawalLimit()
+
+          if (remainingWithdrawalLimit < checksAmount) {
             const error = `Cannot withdraw more than ${
               yamlConfig.limits.withdrawal.level[this.user.level]
             } sats in 24 hours`

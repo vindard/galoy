@@ -124,7 +124,6 @@ type User {
   coordinate: Coordinate
   status: AccountStatus
   twoFactorEnabled: Boolean
-  remainingTwoFactorLimit: Int
 }
 
 type Success {
