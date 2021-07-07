@@ -1,5 +1,5 @@
 import { setupMongoConnection } from "../mongodb"
-import { User } from "../schema"
+import { PhoneCode, User } from "../schema"
 import { baseLogger } from "../logger"
 import mongoose from "mongoose"
 
@@ -28,6 +28,7 @@ afterAll(async () => {
 })
 
 // const phone = "add phone number here with extension (ie: +1...)"
+const phone = ""
 // import { sendTwilioText, sendSMSalaText } from "../text"
 
 it("test sending text. not run as part of the continuous integration", async () => {
@@ -45,6 +46,27 @@ it("test sending text. not run as part of the continuous integration", async () 
     fail("there was an error sending the SMSala text")
   }
 
+  expect(true).toBe(true)
+})
+
+import { requestPhoneCode } from "../text"
+
+it("test requesting phone code. not run as part of the continuous integration", async () => {
+  // uncomment to run the test locally
+
+  try {
+    let phoneCode = await PhoneCode.findOne({ phone }).exec()
+    expect(phoneCode).toBeFalsy()
+
+    await requestPhoneCode({ phone, logger: baseLogger, ip: "" })
+
+    phoneCode = await PhoneCode.findOne({ phone }).exec()
+    expect(phoneCode.twilioMessageSid).toBeTruthy()
+  } catch (err) {
+    console.log(err)
+    fail("there was an error requesting phone code")
+  }
+  
   expect(true).toBe(true)
 })
 
