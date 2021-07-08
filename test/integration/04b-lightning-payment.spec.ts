@@ -481,6 +481,37 @@ it("onUs pushPayment", async () => {
   await checkIsBalanced()
 })
 
+it("shares payer's memo with payee", async () => {
+  const destination = nodesPubKey[0]
+  const memoPayer = "payer's memo"
+  const res = await userWallet1.pay({
+    destination,
+    username: userWallet0.user.username,
+    amount: amountInvoice,
+    memo: memoPayer
+  })
+
+  const userTransaction0 = await userWallet0.getTransactions()
+  
+  const userTransaction1 = await userWallet1.getTransactions()
+
+  expect(res).toBe("success")
+  
+
+  expect(userTransaction0[0]).toHaveProperty("username", userWallet1.user.username)
+  expect(userTransaction0[0]).toHaveProperty(
+    "description",
+    memoPayer,
+  )
+  expect(userTransaction1[0]).toHaveProperty("username", userWallet0.user.username)
+  expect(userTransaction1[0]).toHaveProperty(
+    "description",
+    memoPayer,
+  )
+
+  await checkIsBalanced()
+})
+
 it("onUs pushPayment error for same user", async () => {
   const destination = nodesPubKey[0]
   await expect(
