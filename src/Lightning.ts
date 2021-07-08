@@ -374,7 +374,7 @@ export const LightningMixin = (superclass) =>
                 payerUser: this.user,
                 payeeUser,
                 memoPayer,
-                shareMemoWithPayee: pushPayment ? yamlConfig.shareMemoWithPayee : false
+                shareMemoWithPayee: pushPayment ? yamlConfig.shareMemoWithPayee : false,
               })
             })
 
