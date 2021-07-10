@@ -7,6 +7,7 @@ import {
   openChannel,
   subscribeToChannels,
 } from "lightning"
+import { generateToken } from "node-2fa"
 import { yamlConfig } from "src/config"
 import { FtxDealerWallet } from "src/dealer/FtxDealerWallet"
 import {

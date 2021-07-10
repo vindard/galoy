@@ -2,11 +2,13 @@
  * @jest-environment node
  */
 import mongoose from "mongoose"
-import { usernameExists } from "src/AdminOps"
+import { setAccountStatus, usernameExists } from "src/AdminOps"
 import { yamlConfig } from "src/config"
+import { baseLogger } from "src/logger"
 import { setupMongoConnection } from "src/mongodb"
 import { User } from "src/schema"
-import { getUserWallet } from "./helper"
+import { UserWallet } from "src/userWallet"
+import { generateTokenHelper, getUserWallet } from "./helper"
 
 jest.mock("src/realtimePrice", () => require("../mocks/realtimePrice"))
 

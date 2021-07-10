@@ -13,6 +13,7 @@ import {
   settleHodlInvoice,
 } from "lightning"
 import { yamlConfig } from "src/config"
+import { TwoFactorError } from "src/error"
 import { FEECAP } from "src/lndAuth"
 import { getActiveLnd, nodesPubKey } from "src/lndUtils"
 import { setupMongoConnection } from "src/mongodb"
