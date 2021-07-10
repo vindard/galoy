@@ -333,10 +333,10 @@ functionToTests.forEach(({ fn, name, initialFee }) => {
       tokens: userWallet0.user.twoFactor.threshold + 1,
     })
 
-    const token = generateTokenHelper({ secret: userWallet0.user.twoFactor.secret })
-    expect(await fn(userWallet0)({ invoice: request, twoFactorToken: token })).toBe(
-      "success",
-    )
+    const twoFactorToken = generateTokenHelper({
+      secret: userWallet0.user.twoFactor.secret,
+    })
+    expect(await fn(userWallet0)({ invoice: request, twoFactorToken })).toBe("success")
   })
 })
 

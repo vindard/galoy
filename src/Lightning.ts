@@ -279,7 +279,7 @@ export const LightningMixin = (superclass) =>
         features,
         max_fee,
       } = await validate({ params, logger: lightningLogger })
-      const { memo: memoPayer, twoFactorToken: token } = params
+      const { memo: memoPayer, twoFactorToken } = params
 
       // not including message because it contains the preimage and we don't want to log this
       lightningLogger = lightningLogger.child({
@@ -305,14 +305,14 @@ export const LightningMixin = (superclass) =>
         this.user.twoFactor.secret &&
         remainingTwoFactorLimit < tokens
       ) {
-        if (!token) {
+        if (!twoFactorToken) {
           throw new TwoFactorError("Need a 2FA code to proceed with the payment", {
             logger: lightningLogger,
           })
         }
 
         UserWallet.throwIf2faNotValid({
-          token,
+          token: twoFactorToken,
           logger: lightningLogger,
           secret: this.user.twoFactor.secret,
         })
