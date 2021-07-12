@@ -117,5 +117,3 @@ lnds:
 onchainDustAmount: 5000
 # TODO
 # carrierRegexFilter: ""
-
-shareMemoWithPayee: true
