@@ -21,6 +21,7 @@ import {
   RebalanceNeededError,
   SelfPaymentError,
   TransactionRestrictedError,
+  TwoFactorError,
   ValidationError,
 } from "./error"
 import { customerPath, lndAccountingPath, onchainRevenuePath } from "./ledger/ledger"
@@ -117,6 +118,7 @@ export const OnChainMixin = (superclass) =>
       amount,
       memo,
       sendAll = false,
+      twoFactorToken,
     }: IOnChainPayment): Promise<ISuccess> {
       let onchainLogger = this.logger.child({
         topic: "payment",
@@ -222,16 +224,37 @@ export const OnChainMixin = (superclass) =>
             ? balance.total_in_BTC - this.user.withdrawFee
             : amount
 
+          if (checksAmount < this.config.dustThreshold) {
+            throw new DustAmountError(undefined, { logger: onchainLogger })
+          }
+
           const remainingWithdrawalLimit = await this.user.remainingWithdrawalLimit()
 
           if (remainingWithdrawalLimit < checksAmount) {
             const error = `Cannot withdraw more than ${
               yamlConfig.limits.withdrawal.level[this.user.level]
             } sats in 24 hours`
+            throw new TransactionRestrictedError(error, { logger: onchainLogger })
           }
 
-          if (checksAmount < this.config.dustThreshold) {
-            throw new DustAmountError(undefined, { logger: onchainLogger })
+          const remainingTwoFactorLimit = await this.user.remainingTwoFactorLimit()
+
+          if (
+            yamlConfig.twoFactor?.enabled &&
+            this.user.twoFactor.secret &&
+            remainingTwoFactorLimit < checksAmount
+          ) {
+            if (!twoFactorToken) {
+              throw new TwoFactorError("Need a 2FA code to proceed with the payment", {
+                logger: onchainLogger,
+              })
+            }
+
+            UserWallet.throwIf2faNotValid({
+              token: twoFactorToken,
+              logger: onchainLogger,
+              secret: this.user.twoFactor.secret,
+            })
           }
 
           const { lnd } = getActiveOnchainLnd()
