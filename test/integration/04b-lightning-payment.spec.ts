@@ -12,7 +12,6 @@ import {
   pay,
   settleHodlInvoice,
 } from "lightning"
-import { yamlConfig } from "src/config"
 import { TwoFactorError } from "src/error"
 import { FEECAP } from "src/lndAuth"
 import { getActiveLnd, nodesPubKey } from "src/lndUtils"
@@ -307,13 +306,6 @@ functionToTests.forEach(({ fn, name, initialFee }) => {
   }, 60000)
 
   it(`fails to pay above 2fa limit without 2fa token`, async () => {
-    // this is needed because this test runs twice
-    if (!userWallet0.user.twoFactorEnabled) {
-      const { secret } = userWallet0.generate2fa()
-      const token = generateTokenHelper({ secret })
-      await userWallet0.save2fa({ secret, token })
-    }
-
     const remainingLimit = await userWallet0.user.remainingTwoFactorLimit()
 
     const { request } = await createInvoice({

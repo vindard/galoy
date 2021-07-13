@@ -7,12 +7,14 @@ import { filter, first } from "lodash"
 import mongoose from "mongoose"
 import { yamlConfig } from "src/config"
 import { onchainTransactionEventHandler } from "src/entrypoint/trigger"
+import { TwoFactorError } from "src/error"
 import { MainBook, setupMongoConnection } from "src/mongodb"
 import { getTitle } from "src/notifications/payment"
 import { Transaction } from "src/schema"
 import { bitcoindDefaultClient, sleep } from "src/utils"
 import {
   checkIsBalanced,
+  generateTokenHelper,
   getUserWallet,
   lndonchain,
   lndOutside1,
@@ -394,4 +396,33 @@ it("throws dust amount error", async () => {
   expect(
     userWallet0.onChainPay({ address, amount: yamlConfig.onchainDustAmount - 1 }),
   ).rejects.toThrow()
+})
+
+it("fails to pay above 2fa limit without 2fa token", async () => {
+  if (!userWallet0.user.twoFactorEnabled) {
+    const { secret } = userWallet0.generate2fa()
+    const token = generateTokenHelper({ secret })
+    await userWallet0.save2fa({ secret, token })
+  }
+
+  const remainingLimit = await userWallet0.user.remainingTwoFactorLimit()
+  const address = await bitcoindDefaultClient.getNewAddress()
+  expect(
+    userWallet0.onChainPay({ address, amount: remainingLimit + 1 }),
+  ).rejects.toThrowError(TwoFactorError)
+})
+
+it(`Makes large payment with a 2fa code`, async () => {
+  const address = await bitcoindDefaultClient.getNewAddress()
+
+  const twoFactorToken = generateTokenHelper({
+    secret: userWallet0.user.twoFactor.secret,
+  })
+
+  const paymentResult = await userWallet0.onChainPay({
+    address,
+    amount: userWallet0.user.twoFactor.threshold + 1,
+    twoFactorToken,
+  })
+  expect(paymentResult).toBe(true)
 })
