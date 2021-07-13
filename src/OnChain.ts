@@ -11,6 +11,7 @@ import {
 } from "lightning"
 import _ from "lodash"
 import moment from "moment"
+import { yamlConfig } from "./config"
 import {
   DbError,
   DustAmountError,
@@ -227,6 +228,7 @@ export const OnChainMixin = (superclass) =>
             const error = `Cannot withdraw more than ${
               yamlConfig.limits.withdrawal.level[this.user.level]
             } sats in 24 hours`
+          }
 
           if (checksAmount < this.config.dustThreshold) {
             throw new DustAmountError(undefined, { logger: onchainLogger })

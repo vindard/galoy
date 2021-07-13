@@ -289,14 +289,11 @@ UserSchema.methods.remainingTwoFactorLimit = async function () {
     { type: "payment" },
   ]
 
-  const outgoingSats =
-    (
-      await User.getVolume({
-        after: getTimestampYesterday(),
-        txnType,
-        accounts: this.accountPath,
-      })
-    )?.outgoingSats ?? 0
+  const { outgoingSats } = await User.getVolume({
+    after: getTimestampYesterday(),
+    txnType: [{ type: "on_us" }, { type: "onchain_on_us" }],
+    accounts: this.accountPath,
+  })
 
   return threshold - outgoingSats
 }
@@ -306,14 +303,11 @@ UserSchema.methods.remainingWithdrawalLimit = async function () {
 
   const withdrawalLimit = yamlConfig.limits["withdrawal"].level[this.level]
 
-  const outgoingSats =
-    (
-      await User.getVolume({
-        after: getTimestampYesterday(),
-        txnType: [{ type: { $ne: "on_us" } }],
-        accounts: this.accountPath,
-      })
-    )?.outgoingSats ?? 0
+  const { outgoingSats } = await User.getVolume({
+    after: getTimestampYesterday(),
+    txnType: [{ type: "on_us" }, { type: "onchain_on_us" }],
+    accounts: this.accountPath,
+  })
 
   return withdrawalLimit - outgoingSats
 }
@@ -321,14 +315,11 @@ UserSchema.methods.remainingWithdrawalLimit = async function () {
 UserSchema.methods.remainingOnUsLimit = async function () {
   const onUsLimit = yamlConfig.limits["onUs"].level[this.level]
 
-  const outgoingSats =
-    (
-      await User.getVolume({
-        after: getTimestampYesterday(),
-        txnType: [{ type: "on_us" }, { type: "onchain_on_us" }],
-        accounts: this.accountPath,
-      })
-    )?.outgoingSats ?? 0
+  const { outgoingSats } = await User.getVolume({
+    after: getTimestampYesterday(),
+    txnType: [{ type: "on_us" }, { type: "onchain_on_us" }],
+    accounts: this.accountPath,
+  })
 
   return onUsLimit - outgoingSats
 }
@@ -360,7 +351,11 @@ UserSchema.statics.getVolume = async function ({
       },
     },
   ])
-  return result
+
+  return {
+    outgoingSats: result?.outgoingSats ?? 0,
+    incomingSats: result?.incomingSats ?? 0,
+  }
 }
 
 // FIXME: for onchain wallet from multiple wallet
@@ -385,7 +380,7 @@ UserSchema.virtual("userIsActive").get(async function (this: typeof UserSchema) 
     accounts: this.accountPath,
   })
 
-  return volume?.outgoingSats > 1000 || volume?.incomingSats > 1000
+  return volume.outgoingSats > 1000 || volume.incomingSats > 1000
 })
 
 UserSchema.statics.getUser = async function ({ username, phone }) {

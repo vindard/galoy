@@ -11,6 +11,7 @@ import {
 } from "lightning"
 import lnService from "ln-service"
 import moment from "moment"
+import { yamlConfig } from "./config"
 import {
   DbError,
   InsufficientBalanceError,
