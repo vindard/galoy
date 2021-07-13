@@ -237,7 +237,6 @@ const UserSchema = new Schema({
   twoFactor: {
     secret: {
       type: String,
-      default: undefined,
     },
     threshold: {
       type: Number,

@@ -123,7 +123,7 @@ type User {
   created_at: String
   coordinate: Coordinate
   status: AccountStatus
-  twoFactorEnabled: Boolean
+  twoFactorEnabled: Boolean!
 }
 
 type Success {
@@ -224,7 +224,7 @@ type TwoFactorSecret {
 }
 
 type WalletFees {
-  deposit: Float
+  deposit: Float!
 }
 
 type UpdateUser {
