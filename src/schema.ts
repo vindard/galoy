@@ -272,7 +272,7 @@ UserSchema.virtual("oldEnoughForWithdrawal").get(function (this: typeof UserSche
 })
 
 UserSchema.virtual("twoFactorEnabled").get(function (this: typeof UserSchema) {
-  return !!this.twoFactor.secret
+  return this.twoFactor.secret != null
 })
 
 const getTimestampYesterday = () => Date.now() - MS_PER_DAY
