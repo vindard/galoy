@@ -9,13 +9,13 @@
     "esModuleInterop": true,
     "baseUrl": "./",
     "moduleResolution": "node",
-    "resolveJsonModule": true,
-    "paths": {
-      "*": [
-        // "node_modules/*",
-        "src/types/*"
-      ]
-    }
+    "resolveJsonModule": true
+    // "paths": {
+    //   "*": [
+    //     // "node_modules/*",
+    //     "src/types/*"
+    //   ]
+    // }
   },
   "compileOnSave": true,
   "include": ["src/**/*", "test/**/*"]
