@@ -21,31 +21,29 @@ try {
 
 export const yamlConfig = _.merge(defaultConfig, customConfig)
 
-export class TransactionLimits implements ITransactionLimits {
-  readonly config
-  readonly level
+const limitConstants = {
+  oldEnoughForWithdrawalHours: yamlConfig.limits.oldEnoughForWithdrawal / MS_IN_HOUR,
+  oldEnoughForWithdrawalMicroseconds: yamlConfig.limits.oldEnoughForWithdrawal,
+}
 
-  constructor({ level }) {
-    this.config = yamlConfig.limits
-    this.level = level
+export const selectUserLimits = ({ level }: { level: number }): IUserLimits => {
+  const config = yamlConfig.limits
+  return {
+    onUsLimit: config.onUs.level[level],
+    withdrawalLimit: config.withdrawal.level[level],
   }
-
-  onUsLimit = () => this.config.onUs.level[this.level]
-
-  withdrawalLimit = () => this.config.withdrawal.level[this.level]
-
-  oldEnoughForWithdrawalLimit = () => this.config.oldEnoughForWithdrawal / MS_IN_HOUR
 }
 
 export const getUserWalletConfig = (user): UserWalletConfig => {
-  const transactionLimits = new TransactionLimits({
-    level: user.level,
-  })
+  const userLimits = selectUserLimits({ level: user.level })
 
   return {
     name: yamlConfig.name,
     dustThreshold: yamlConfig.onChainWallet.dustThreshold,
-    limits: transactionLimits,
+    limits: {
+      oldEnoughForWithdrawalLimit: limitConstants.oldEnoughForWithdrawalHours,
+      ...userLimits,
+    },
   }
 }
 

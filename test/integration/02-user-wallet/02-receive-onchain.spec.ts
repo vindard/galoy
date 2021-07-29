@@ -1,7 +1,7 @@
 import { once } from "events"
 import { filter } from "lodash"
 import { baseLogger } from "src/logger"
-import { TransactionLimits } from "src/config"
+import { selectUserLimits } from "src/config"
 import { getCurrentPrice } from "src/realtimePrice"
 import { btc2sat, sat2btc, sleep } from "src/utils"
 import { getFunderWallet } from "src/walletFactory"
@@ -30,9 +30,7 @@ let walletUser11
 let walletUser12
 let amountBTC
 
-const transactionLimits = new TransactionLimits({
-  level: "1",
-})
+const userLimits = selectUserLimits({ level: 1 })
 
 jest.mock("src/notifications/notification")
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -72,14 +70,14 @@ describe("UserWallet - On chain", () => {
 
   it("receives on-chain transaction with max limit for withdrawal level1", async () => {
     /// TODO? add sendAll tests in which the user has more than the limit?
-    const level1WithdrawalLimit = transactionLimits.withdrawalLimit() // sats
+    const level1WithdrawalLimit = userLimits.withdrawalLimit // sats
     amountBTC = sat2btc(level1WithdrawalLimit)
     walletUser11 = await getUserWallet(11)
     await sendToWallet({ walletDestination: walletUser11 })
   })
 
   it("receives on-chain transaction with max limit for onUs level1", async () => {
-    const level1OnUsLimit = transactionLimits.onUsLimit() // sats
+    const level1OnUsLimit = userLimits.onUsLimit // sats
     amountBTC = sat2btc(level1OnUsLimit)
     walletUser12 = await getUserWallet(12)
     await sendToWallet({ walletDestination: walletUser12 })
