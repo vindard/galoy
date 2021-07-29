@@ -16,7 +16,7 @@ import path from "path"
 
 import { baseLogger } from "../logger"
 import { addToMap, setAccountStatus, setLevel } from "../AdminOps"
-import { yamlConfig, levels, onboardingEarn } from "../config"
+import { yamlConfig, levels, onboardingEarn, selectTransactionLimits } from "../config"
 import { getActiveLnd, nodesStats, nodeStats } from "../lndUtils"
 import { getHourlyPrice, getMinBuildNumber } from "../localCache"
 import { sendNotification } from "../notifications/notification"
@@ -150,10 +150,11 @@ const resolvers = {
     },
     getLevels: () => levels,
     getLimits: (_, __, { user }) => {
+      const transactionLimits = selectTransactionLimits({ level: user.level })
       return {
-        oldEnoughForWithdrawal: yamlConfig.limits.oldEnoughForWithdrawal,
-        withdrawal: yamlConfig.limits.withdrawal.level[user.level],
-        onUs: yamlConfig.limits.onUs.level[user.level],
+        oldEnoughForWithdrawal: transactionLimits.oldEnoughForWithdrawalLimit,
+        withdrawal: transactionLimits.withdrawalLimit,
+        onUs: transactionLimits.onUsLimit,
       }
     },
     getWalletFees: () => ({

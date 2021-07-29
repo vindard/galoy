@@ -1,6 +1,6 @@
 import * as _ from "lodash"
 import * as mongoose from "mongoose"
-import { yamlConfig, levels } from "./config"
+import { yamlConfig, levels, selectUserLimits, limitConstants } from "./config"
 import { NotFoundError } from "./error"
 import { accountPath } from "./ledger/ledger"
 import { baseLogger } from "./logger"
@@ -255,9 +255,9 @@ UserSchema.virtual("accountPath").get(function (this: typeof UserSchema) {
 
 // eslint-disable-next-line no-unused-vars
 UserSchema.virtual("oldEnoughForWithdrawal").get(function (this: typeof UserSchema) {
-  const d = Date.now()
+  const elapsed = Date.now() - this.created_at.getTime()
   // console.log({d, created_at: this.created_at.getTime(), oldEnough: yamlConfig.limits.oldEnoughForWithdrawal})
-  return d - this.created_at.getTime() > yamlConfig.limits.oldEnoughForWithdrawal
+  return elapsed > limitConstants.oldEnoughForWithdrawalMicroseconds
 })
 
 UserSchema.methods.limitHit = async function ({
@@ -273,7 +273,8 @@ UserSchema.methods.limitHit = async function ({
     ? [{ type: "on_us" }, { type: "onchain_on_us" }]
     : [{ type: { $ne: "on_us" } }]
 
-  const limit = yamlConfig.limits[on_us ? "onUs" : "withdrawal"].level[this.level]
+  const userLimits = selectUserLimits({ level: this.level })
+  const limit = on_us ? userLimits.onUsLimit : userLimits.withdrawalLimit
 
   const outgoingSats =
     (
