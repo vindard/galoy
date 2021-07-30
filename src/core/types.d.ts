@@ -54,6 +54,13 @@ type UserWalletConstructorArgs = WalletConstructorArgs & {
   config: UserWalletConfig
 }
 
+type IpConfig = {
+  ipRecordingEnabled: boolean
+  proxyCheckingEnabled: boolean
+  blacklistedIPTypes: string[]
+  blacklistedIPs: string[]
+}
+
 // Currently unused types
 
 interface IAddBTCInvoiceRequest {

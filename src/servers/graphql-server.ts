@@ -8,7 +8,7 @@ import PinoHttp from "pino-http"
 import { v4 as uuidv4 } from "uuid"
 import helmet from "helmet"
 
-import { yamlConfig } from "@config/app"
+import { getIpConfig } from "@config/app"
 
 import { baseLogger } from "@services/logger"
 import { redis } from "@services/redis"
@@ -19,6 +19,8 @@ import { isDev, updateIPDetails, isIPBlacklisted } from "@core/utils"
 import { WalletFactory } from "@core/wallet-factory"
 
 const graphqlLogger = baseLogger.child({ module: "graphql" })
+
+const ipConfig = getIpConfig()
 
 export const isAuthenticated = rule({ cache: "contextual" })((parent, args, ctx) => {
   if (ctx.uid === null) {
@@ -65,7 +67,7 @@ export const startApolloServer = async ({
           { new: true },
         )
 
-        if (yamlConfig.ipRecording.enabled) {
+        if (ipConfig.ipRecordingEnabled) {
           updateIPDetails({ ip, user, logger })
         }
 
